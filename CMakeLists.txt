@@ -20,6 +20,9 @@ string(REGEX REPLACE " Doom$" "" PACKAGE_SHORTNAME "${PACKAGE_NAME}")
 set(PACKAGE_COPYRIGHT "Copyright (C) 1993-2025")
 set(PACKAGE_LICENSE "GNU General Public License, version 2")
 
+set(MRE true)
+add_definitions(-DMRE)
+
 # Any settings that should apply to all targets in this directory and all
 # subdirectories should go here.  Use judiciously.
 if(MSVC)
@@ -33,8 +36,8 @@ endif()
 option(CMAKE_FIND_PACKAGE_PREFER_CONFIG
        "Lookup package config files before using find modules" On)
 
-option(ENABLE_SDL2_NET "Enable SDL2_net" On)
-option(ENABLE_SDL2_MIXER "Enable SDL2_mixer" On)
+option(ENABLE_SDL2_NET "Enable SDL2_net" Off)
+option(ENABLE_SDL2_MIXER "Enable SDL2_mixer" Off)
 
 if (NOT DEFINED EMSCRIPTEN)
     find_package(SDL2 2.0.14)
@@ -100,6 +103,6 @@ configure_file(src/setup-res.rc.in src/setup-res.rc)
 configure_file(src/setup/setup-manifest.xml.in src/setup/setup-manifest.xml)
 configure_file(src/strife-res.rc.in src/strife-res.rc)
 
-foreach(SUBDIR textscreen opl pcsound src)
+foreach(SUBDIR mre textscreen opl pcsound src)
     add_subdirectory("${SUBDIR}")
 endforeach()

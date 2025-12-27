@@ -13,8 +13,11 @@
 
 VMWCHAR wpath_buf[256];
 
-ssize_t _write(int fd, const void *buf, size_t count) __attribute__((alias("write")));
-int write(int fd, const void* buffer, unsigned int count) {
+#define SYSCALL(ret_type, func_name, args_def) \
+    ret_type _##func_name args_def __attribute__((alias(#func_name))); \
+    ret_type func_name args_def
+
+SYSCALL(int, write, (int fd, const void* buffer, unsigned int count)){
     if (fd < 3) {
         for (int i = 0; i < count; ++i)
             console_put_char(((const char*)buffer)[i]);
@@ -26,8 +29,7 @@ int write(int fd, const void* buffer, unsigned int count) {
     return writen;
 }
 
-ssize_t _read(int fd, void *buf, size_t count) __attribute__((alias("read")));
-ssize_t read(int fd, void *buf, size_t count) {
+SYSCALL(ssize_t, read, (int fd, void *buf, size_t count)){
     if(fd<3)
         return 0;
 
@@ -36,14 +38,11 @@ ssize_t read(int fd, void *buf, size_t count) {
     return writen;
 }
 
-void * _sbrk(ptrdiff_t __incr) __attribute__((alias("sbrk")));
-void * sbrk(ptrdiff_t __incr)
-{
+SYSCALL(void*, sbrk, (ptrdiff_t __incr)) {
     exit(-100);
 }
 
-int _close(int fd) __attribute__((alias("close")));
-int close(int fd) {
+SYSCALL(int, close, (int fd)) {
     if(fd < 3)
         return 0;
 
@@ -51,12 +50,9 @@ int close(int fd) {
     return 0;
 }
 
-off_t _lseek(int fd, off_t offset, int whence) __attribute__((alias("lseek")));
-off_t lseek(int fd, off_t offset, int whence) {}
+SYSCALL(off_t, lseek, (int fd, off_t offset, int whence)) {}
 
-int _open(const char *pathname, int flags, ...) __attribute__((alias("open")));
-int open(const char *pathname, int flags, ...)
-{
+SYSCALL(int, open, (const char *pathname, int flags, ...)) {
     VMUINT mre_mode = 0;
     if (flags == O_RDONLY)
         mre_mode = MODE_READ;
@@ -78,9 +74,7 @@ int open(const char *pathname, int flags, ...)
         return fd + 3;
 }
 
-void _exit(int status) __attribute__((alias("exit")));
-void exit(int status)
-{
+SYSCALL(void, exit, (int status)) {
 	cprintf("exit(%d)\n", status);
 
     vm_exit_app();
@@ -88,19 +82,18 @@ void exit(int status)
     thread_next();
 }
 
-void abort(){
+SYSCALL(void, abort, ()){
 	cprintf("abort()\n");
 	exit(-12);
 }
 
-pid_t _getpid(void) __attribute__((alias("getpid")));
-pid_t getpid(void) { return 20;}
+SYSCALL(pid_t, getpid, (void)) {
+    return 20;
+}
 
-void _kill() __attribute__((alias("kill")));
-void kill() {}
+SYSCALL(void, kill, ()) {}
 
-int _fstat(int fd, struct stat *buf) __attribute__((alias("fstat")));
-int fstat(int fd, struct stat *buf) {
+SYSCALL(int, fstat, (int fd, struct stat *buf)) {
     if (fd < 3)
         return -1;
     VMUINT file_size;
@@ -119,11 +112,9 @@ int fstat(int fd, struct stat *buf) {
     return 0;
 }
 
-int _isatty(int fd) __attribute__((alias("isatty")));
-int isatty(int fd) {}
+SYSCALL(int, isatty, (int fd)) {}
 
-int _stat(const char *path, struct stat *sbuf) __attribute__((alias("stat")));
-int stat(const char *path, struct stat *sbuf) {}
+SYSCALL(int, stat, (const char *path, struct stat *sbuf)) {}
 
 #ifdef WIN32
 #define MODET
@@ -138,13 +129,11 @@ int mkdir(const char *_path, mode_t __mode) {
 
 int rmdir(const char *dirname) {}
 
-int _link_r(char *old, char *new) __attribute__((alias("link_r")));
-int link_r(char *old, char *new) {
+SYSCALL(int, link_r, (char *old, char *new)) {
 	return -1;
 }
 
-int _unlink_r(char *name) __attribute__((alias("unlink_r")));
-int unlink_r(char *name) {
+SYSCALL(int, unlink_r, (char *name)) {
 	return -1;
 }
 
@@ -188,8 +177,7 @@ int fcntl (int, int, ...){}
 
 #include <time.h>
 
-int _gettimeofday(struct timeval *tv, struct timezone *tz) __attribute__((alias("gettimeofday")));
-int gettimeofday(struct timeval *tv, struct timezone *tz) {
+SYSCALL(int, gettimeofday, (struct timeval *tv, struct timezone *tz)) {
 	if (tv)
 	{
 		VMUINT sec = 0;

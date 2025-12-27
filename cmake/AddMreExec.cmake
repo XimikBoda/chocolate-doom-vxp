@@ -6,7 +6,7 @@ function(add_mre_exec TARGET_NAME)
     set(SRCS ${ARGV})
 
     if(${CMAKE_SYSTEM_NAME} STREQUAL MRE_NATIVE) # For Phone
-        add_executable(${TARGET_NAME} ${SRCS} "${COMMON_DIR}/armmain.c" "${COMMON_DIR}/syscalls.c")
+        add_executable(${TARGET_NAME} ${SRCS} "${COMMON_DIR}/armmain.c" "${COMMON_DIR}/syscalls.c" "${COMMON_DIR}/malloc.c")
 
         target_link_options(${TARGET_NAME} PRIVATE 
             "-T${COMMON_DIR}/scat.ld"

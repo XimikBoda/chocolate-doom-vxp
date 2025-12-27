@@ -89,3 +89,19 @@ void console_put_str(const char *str)
     if (scr_clear_width == scr_width)
         flush_layer();
 }
+
+static char buf[1024];
+
+#include <stdarg.h>
+#include <vmstdlib.h>
+
+int cprintf(char const* const format, ...) {
+	va_list aptr;
+
+	va_start(aptr, format);
+	int ret = vm_vsprintf(buf, format, aptr);
+	va_end(aptr);
+
+	console_put_str(buf);
+	return ret;
+}

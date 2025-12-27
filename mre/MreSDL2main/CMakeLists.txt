@@ -1,6 +1,6 @@
 add_library(MreSDL2main STATIC SDL2main.c)
 
-target_link_libraries(MreSDL2main mreapi console)
+target_link_libraries(MreSDL2main mreapi console libco)
 
 add_library(SDL2main ALIAS MreSDL2main)
 add_library(SDL2::SDL2main ALIAS MreSDL2main)

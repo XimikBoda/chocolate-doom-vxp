@@ -5,7 +5,7 @@ add_library(MreSDL2 STATIC ${sources} ${headers})
 
 target_include_directories(MreSDL2 PUBLIC "include/")
 
-target_link_libraries(MreSDL2 mreapi)
+target_link_libraries(MreSDL2 mreapi libco)
 
 add_library(SDL2 ALIAS MreSDL2)
 add_library(SDL2::SDL2 ALIAS MreSDL2)

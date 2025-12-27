@@ -17,6 +17,11 @@
 
 #include "SDL.h"
 
+#ifdef MRE
+#include <vmgraph.h>
+#endif // MRE
+
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,6 +90,7 @@ static const struct {
 // Unicode key mapping; see codepage.h.
 static const short code_page_to_unicode[] = CODE_PAGE_TO_UNICODE;
 
+#ifndef MRE
 static const SDL_Color ega_colors[] =
 {
     {0x00, 0x00, 0x00, 0xff},          // 0: Black
@@ -104,6 +110,26 @@ static const SDL_Color ega_colors[] =
     {0xff, 0xff, 0x55, 0xff},          // 14: Yellow
     {0xff, 0xff, 0xff, 0xff},          // 15: Bright white
 };
+#else
+static const uint16_t ega_colors[] = {
+    VM_COLOR_888_TO_565(0x00, 0x00, 0x00), // 0: Black
+    VM_COLOR_888_TO_565(0x00, 0x00, 0xaa), // 1: Blue
+    VM_COLOR_888_TO_565(0x00, 0xaa, 0x00), // 2: Green
+    VM_COLOR_888_TO_565(0x00, 0xaa, 0xaa), // 3: Cyan
+    VM_COLOR_888_TO_565(0xaa, 0x00, 0x00), // 4: Red
+    VM_COLOR_888_TO_565(0xaa, 0x00, 0xaa), // 5: Magenta
+    VM_COLOR_888_TO_565(0xaa, 0x55, 0x00), // 6: Brown
+    VM_COLOR_888_TO_565(0xaa, 0xaa, 0xaa), // 7: Grey
+    VM_COLOR_888_TO_565(0x55, 0x55, 0x55), // 8: Dark grey
+    VM_COLOR_888_TO_565(0x55, 0x55, 0xff), // 9: Bright blue
+    VM_COLOR_888_TO_565(0x55, 0xff, 0x55), // 10: Bright green
+    VM_COLOR_888_TO_565(0x55, 0xff, 0xff), // 11: Bright cyan
+    VM_COLOR_888_TO_565(0xff, 0x55, 0x55), // 12: Bright red
+    VM_COLOR_888_TO_565(0xff, 0x55, 0xff), // 13: Bright magenta
+    VM_COLOR_888_TO_565(0xff, 0xff, 0x55), // 14: Yellow
+    VM_COLOR_888_TO_565(0xff, 0xff, 0xff), // 15: Bright white
+};
+#endif // !MRE
 
 #ifdef _WIN32
 
@@ -240,6 +266,8 @@ int TXT_Init(void)
     screen_image_w = TXT_SCREEN_W * font->w;
     screen_image_h = TXT_SCREEN_H * font->h;
 
+#ifndef MRE
+
     // If highdpi_font is selected, try to initialize high dpi rendering.
     if (font == &highdpi_font)
     {
@@ -290,6 +318,7 @@ int TXT_Init(void)
     // Instead, we draw everything into an intermediate 8-bit surface
     // the same dimensions as the screen. SDL then takes care of all the
     // 8->32 bit (or whatever depth) color conversions for us.
+
     screenbuffer = SDL_CreateRGBSurface(0,
                                         TXT_SCREEN_W * font->w,
                                         TXT_SCREEN_H * font->h,
@@ -298,6 +327,7 @@ int TXT_Init(void)
     SDL_LockSurface(screenbuffer);
     SDL_SetPaletteColors(screenbuffer->format->palette, ega_colors, 0, 16);
     SDL_UnlockSurface(screenbuffer);
+#endif // !MRE
 
     screendata = malloc(TXT_SCREEN_W * TXT_SCREEN_H * 2);
     memset(screendata, 0, TXT_SCREEN_W * TXT_SCREEN_H * 2);
@@ -309,20 +339,24 @@ void TXT_Shutdown(void)
 {
     free(screendata);
     screendata = NULL;
+
     SDL_FreeSurface(screenbuffer);
     screenbuffer = NULL;
+#ifndef MRE
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(TXT_SDLWindow);
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
+#endif // !MRE
 }
 
 void TXT_SetColor(txt_color_t color, int r, int g, int b)
 {
     SDL_Color c = {r, g, b, 0xff};
-
+#ifndef MRE
     SDL_LockSurface(screenbuffer);
     SDL_SetPaletteColors(screenbuffer->format->palette, &c, color, 1);
     SDL_UnlockSurface(screenbuffer);
+#endif // !MRE
 }
 
 unsigned char *TXT_GetScreenData(void)
@@ -361,6 +395,8 @@ static inline void UpdateCharacter(int x, int y)
     p = &font->data[(character * font->w * font->h) / 8];
     bit = 0;
 
+#ifndef MRE
+
     s = ((unsigned char *) screenbuffer->pixels)
       + (y * font->h * screenbuffer->pitch)
       + (x * font->w);
@@ -390,6 +426,27 @@ static inline void UpdateCharacter(int x, int y)
 
         s += screenbuffer->pitch;
     }
+#else
+    extern VMUINT16 *scr_buf;
+
+    for (int i = 0; i < font->h; ++i)
+    {
+        for (int j = 0; j < font->w; ++j)
+        {
+            int xx = 240 - 1 - (y * font->h + i);
+            int yy = (x * font->w + j);
+            scr_buf[xx + yy * 240] =
+                ((((*p) >> bit) & 1) ? ega_colors[fg] : ega_colors[bg]);
+
+            ++bit;
+            if (bit == 8)
+            {
+                ++p;
+                bit = 0;
+            }
+        }
+    }
+#endif // MRE
 }
 
 static int LimitToRange(int val, int min, int max)
@@ -448,6 +505,7 @@ void TXT_UpdateScreenArea(int x, int y, int w, int h)
 
     // TODO: This is currently creating a new texture every time we render
     // the screen; find a more efficient way to do it.
+#ifndef MRE
     screentx = SDL_CreateTextureFromSurface(renderer, screenbuffer);
 
     SDL_RenderClear(renderer);
@@ -456,6 +514,9 @@ void TXT_UpdateScreenArea(int x, int y, int w, int h)
     SDL_RenderPresent(renderer);
 
     SDL_DestroyTexture(screentx);
+#else
+    flush_layer();
+#endif // !MRE
 }
 
 void TXT_UpdateScreen(void)

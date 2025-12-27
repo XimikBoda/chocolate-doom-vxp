@@ -66,6 +66,43 @@ int unlink_r(char *name) {
 	return -1;
 }
 
+int fork(){
+	return -1;
+}
+
+int waitpid(){
+	return -1;
+}
+
+int execvp(){
+	return -1;
+}
+
+int execv(){
+	return -1;
+}
+
+int pipe(){
+	return -1;
+}
+
+int log(){
+	return -1;
+}
+
+int usleep(){
+	return -1;
+}
+
+int ceil(){
+	return -1;
+}
+
+int dup2(){
+	return -1;
+}
+
+int fcntl (int, int, ...){}
 
 #include <time.h>
 

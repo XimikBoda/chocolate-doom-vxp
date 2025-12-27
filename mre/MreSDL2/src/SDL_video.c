@@ -26,6 +26,8 @@ int SDL_GetCurrentDisplayMode(int displayIndex, SDL_DisplayMode *mode){
 
     mode->refresh_rate = 30;
     mode->driverdata = NULL;
+
+    return 0;
 }
 
 SDL_Window* SDL_CreateWindow(const char *title, int x, int y, int w, int h, Uint32 flags){

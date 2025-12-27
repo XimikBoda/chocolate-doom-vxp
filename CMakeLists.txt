@@ -34,7 +34,9 @@ set(TinyMRESDK "$ENV{TinyMRESDK}" CACHE STRING "TinyMRESDK dir")
 
 include(cmake/MreUtils.cmake)
 
-set(CMAKE_SYSTEM_NAME MRE_MODIS)
+if(MSVC)
+    set(CMAKE_SYSTEM_NAME MRE_MODIS)
+endif()
 
 set(MRE true)
 add_definitions(-DMRE)

@@ -20,18 +20,18 @@ void free(void* ptr) {
     vm_free(ptr);
 }
 
-void* _malloc_r(size_t size) {
+void* _malloc_r(struct _reent *reent_ptr, size_t size) {
     return malloc(size);
 }
 
-void* _calloc_r(size_t number, size_t size) {
+void* _calloc_r(struct _reent *reent_ptr, size_t number, size_t size) {
     return calloc(number, size);
 }
 
-void* _realloc_r(void* ptr, size_t newsize) {
+void* _realloc_r(struct _reent *reent_ptr, void* ptr, size_t newsize) {
     return realloc(ptr, newsize);
 }
 
-void _free_r(void* ptr) {
+void _free_r(struct _reent *reent_ptr, void* ptr) {
     vm_free(ptr);
 }

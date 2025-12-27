@@ -20,6 +20,22 @@ string(REGEX REPLACE " Doom$" "" PACKAGE_SHORTNAME "${PACKAGE_NAME}")
 set(PACKAGE_COPYRIGHT "Copyright (C) 1993-2025")
 set(PACKAGE_LICENSE "GNU General Public License, version 2")
 
+set(DEVELOPER_NAME "")
+set(RAM "3000") #Ram requirement (in kb)
+set(IMSI "1234567890" CACHE STRING "Imsi of first SIM-card")
+set(API "File SIM_card ProMng UDP") #Api for app, 
+set(APPID "0") #App id, special values: -1 is personal (imsi), 0 is in developing
+set(CERTID "1" CACHE STRING "") #Cert id use from you cert, 1 is personal (imsi)
+set(CERT "none" CACHE STRING "Path to cert, used when APPID!=-1 and CERTID!=1")
+option(BACKGROUND "App can work background" OFF)
+
+set(MRE_SDK "$ENV{MRE_SDK}" CACHE STRING "MRE SDK dir")
+set(TinyMRESDK "$ENV{TinyMRESDK}" CACHE STRING "TinyMRESDK dir")
+
+include(cmake/MreUtils.cmake)
+
+set(CMAKE_SYSTEM_NAME MRE_MODIS)
+
 set(MRE true)
 add_definitions(-DMRE)
 

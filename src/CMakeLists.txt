@@ -238,7 +238,17 @@ set(SETUP_FILES
     net_structrw.c      net_structrw.h
     z_native.c          z_zone.h)
 
-if(WIN32)
+if(DEFINED MRE)
+    add_exec_vxp("${PROGRAM_PREFIX}setup" 
+        SRCS ${SETUP_FILES} ${COMMON_SOURCE_FILES}
+        RESOURCES resources
+        APP_NAME "${PROGRAM_PREFIX}setup" 
+        APPID "${APPID}"
+        BACKGROUND ${BACKGROUND}
+        API "${API}"
+        RAM "${RAM}"
+    )
+elseif(WIN32)
     add_executable("${PROGRAM_PREFIX}setup" WIN32 ${SETUP_FILES} ${COMMON_SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/setup-res.rc")
 else()
     add_executable("${PROGRAM_PREFIX}setup" ${SETUP_FILES} ${COMMON_SOURCE_FILES})

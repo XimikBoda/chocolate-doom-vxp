@@ -21,7 +21,7 @@ set(PACKAGE_COPYRIGHT "Copyright (C) 1993-2025")
 set(PACKAGE_LICENSE "GNU General Public License, version 2")
 
 set(DEVELOPER_NAME "")
-set(RAM "3000") #Ram requirement (in kb)
+set(RAM "4000") #Ram requirement (in kb)
 set(IMSI "1234567890" CACHE STRING "Imsi of first SIM-card")
 set(API "File SIM_card ProMng UDP") #Api for app, 
 set(APPID "0") #App id, special values: -1 is personal (imsi), 0 is in developing

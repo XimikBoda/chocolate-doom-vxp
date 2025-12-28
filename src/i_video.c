@@ -30,6 +30,10 @@
 #include <windows.h>
 #endif
 
+#ifdef MRE
+#include "vmgraph.h"
+#endif //MRE
+
 #include "config.h"
 #include "d_loop.h"
 #include "deh_str.h"
@@ -70,6 +74,11 @@ static SDL_Surface *argbbuffer = NULL;
 static SDL_Texture *texture = NULL;
 static SDL_Texture *texture_upscaled = NULL;
 
+#ifdef MRE
+extern VMUINT16 *scr_buf;
+extern VMUINT16 *scr_buf2;
+#endif //MRE
+
 static SDL_Rect blit_rect = {
     0,
     0,
@@ -78,8 +87,11 @@ static SDL_Rect blit_rect = {
 };
 
 // palette
-
+#ifndef MRE
 static SDL_Color palette[256];
+#else
+static VMUINT16 palette[256];
+#endif
 static boolean palette_to_set;
 
 // display has been set up?
@@ -620,6 +632,8 @@ static void CreateUpscaledTexture(boolean force)
     int h_upscale, w_upscale;
     static int h_upscale_old, w_upscale_old;
 
+#ifndef MRE
+
     SDL_Texture *new_texture, *old_texture;
 
     // Get the size of the renderer output. The units this gives us will be
@@ -696,6 +710,9 @@ static void CreateUpscaledTexture(boolean force)
     {
         SDL_DestroyTexture(old_texture);
     }
+
+    
+#endif // !MRE
 }
 
 //
@@ -771,6 +788,7 @@ void I_FinishUpdate (void)
 
     if (palette_to_set)
     {
+#ifndef MRE
         SDL_SetPaletteColors(screenbuffer->format->palette, palette, 0, 256);
         palette_to_set = false;
 
@@ -781,7 +799,12 @@ void I_FinishUpdate (void)
             SDL_SetRenderDrawColor(renderer, palette[0].r, palette[0].g,
                 palette[0].b, SDL_ALPHA_OPAQUE);
         }
+#endif // !MRE
     }
+
+#ifndef MRE
+
+
 
     // Blit from the paletted 8-bit screen buffer to the intermediate
     // 32-bit RGBA buffer and update the intermediate texture with the
@@ -818,6 +841,14 @@ void I_FinishUpdate (void)
     // Draw!
 
     SDL_RenderPresent(renderer);
+#else
+    for (int y = 0; y < SCREENHEIGHT; ++y)
+        for (int x = 0; x < SCREENWIDTH; ++x) {
+            VMUINT16 c = palette[I_VideoBuffer[y * SCREENWIDTH + x]];
+            scr_buf[240 - 1 - y + (x) * 240] = c;
+        }
+    flush_layer();
+#endif // !MRE
 
     // Restore background and undo the disk indicator, if it was drawn.
     V_RestoreDiskBackground();
@@ -844,11 +875,18 @@ void I_SetPalette (byte *doompalette)
     {
         // Zero out the bottom two bits of each channel - the PC VGA
         // controller only supports 6 bits of accuracy.
-
+#ifndef MRE
         palette[i].a = 0xFFU;
         palette[i].r = gammatable[usegamma][*doompalette++] & ~3;
         palette[i].g = gammatable[usegamma][*doompalette++] & ~3;
         palette[i].b = gammatable[usegamma][*doompalette++] & ~3;
+#else
+        palette[i] = VM_COLOR_888_TO_565(
+            (gammatable[usegamma][doompalette[0]] & ~3),
+            (gammatable[usegamma][doompalette[1]] & ~3),
+            (gammatable[usegamma][doompalette[2]] & ~3));
+        doompalette += 3;
+#endif
     }
 
     palette_to_set = true;
@@ -865,9 +903,15 @@ int I_GetPaletteIndex(int r, int g, int b)
 
     for (i = 0; i < 256; ++i)
     {
+#ifndef MRE
         diff = (r - palette[i].r) * (r - palette[i].r)
              + (g - palette[i].g) * (g - palette[i].g)
              + (b - palette[i].b) * (b - palette[i].b);
+#else
+        diff = (r - VM_COLOR_GET_RED(palette[i])) * (r - VM_COLOR_GET_RED(palette[i]))
+             + (g - VM_COLOR_GET_GREEN(palette[i])) * (g - VM_COLOR_GET_GREEN(palette[i]))
+             + (b - VM_COLOR_GET_BLUE(palette[i])) * (b - VM_COLOR_GET_BLUE(palette[i]));
+#endif
 
         if (diff < best_diff)
         {
@@ -918,6 +962,7 @@ void I_RegisterWindowIcon(const unsigned int *icon, int width, int height)
 
 void I_InitWindowIcon(void)
 {
+#ifndef MRE
     SDL_Surface *surface;
 
     surface = SDL_CreateRGBSurfaceFrom((void *) icon_data, icon_w, icon_h,
@@ -927,6 +972,7 @@ void I_InitWindowIcon(void)
 
     SDL_SetWindowIcon(screen, surface);
     SDL_FreeSurface(surface);
+#endif // !MRE
 }
 
 // Set video size to a particular scale factor (1x, 2x, 3x, etc.)
@@ -1408,6 +1454,7 @@ static void SetVideoMode(void)
     }
 #endif
 
+
     // Initially create the upscaled texture for rendering to screen
 
     CreateUpscaledTexture(true);
@@ -1422,6 +1469,8 @@ void I_InitGraphics(void)
     // Pass through the XSCREENSAVER_WINDOW environment variable to 
     // SDL_WINDOWID, to embed the SDL window into the Xscreensaver
     // window.
+
+#ifndef MRE
 
     env = getenv("XSCREENSAVER_WINDOW");
 
@@ -1488,12 +1537,18 @@ void I_InitGraphics(void)
         SDL_Delay(startup_delay);
     }
 
+#endif //!MRE
+
     // The actual 320x200 canvas that we draw to. This is the pixel buffer of
     // the 8-bit paletted screen buffer that gets blit on an intermediate
     // 32-bit RGBA screen buffer that gets loaded into a texture that gets
     // finally rendered into our window or full screen in I_FinishUpdate().
 
+#ifndef MRE
     I_VideoBuffer = screenbuffer->pixels;
+#else
+    I_VideoBuffer = scr_buf2;
+#endif //!MRE
     V_RestoreBuffer();
 
     // Clear the screen to black.

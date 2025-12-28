@@ -125,7 +125,7 @@ typedef int16_t dpixel_t;
 
 #include <limits.h>
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(MRE)
 
 #define DIR_SEPARATOR '\\'
 #define DIR_SEPARATOR_S "\\"

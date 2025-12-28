@@ -83,8 +83,9 @@ void I_UnsetVideoModeHR(void)
 void I_ClearScreenHR(void)
 {
     SDL_Rect area = { 0, 0, HR_SCREENWIDTH, HR_SCREENHEIGHT };
-
+#ifndef MRE
     SDL_FillRect(hr_surface, &area, 0);
+#endif // !MRE
 }
 
 void I_SlamBlockHR(int x, int y, int w, int h, const byte *src)
@@ -150,9 +151,11 @@ void I_SlamBlockHR(int x, int y, int w, int h, const byte *src)
     blit_rect.y = y;
     blit_rect.w = w;
     blit_rect.h = h;
+#ifndef MRE
     SDL_BlitSurface(hr_surface, &blit_rect,
                     SDL_GetWindowSurface(hr_screen), &blit_rect);
     SDL_UpdateWindowSurfaceRects(hr_screen, &blit_rect, 1);
+#endif // !MRE
 }
 
 void I_SlamHR(const byte *buffer)
@@ -178,11 +181,14 @@ void I_SetPaletteHR(const byte *palette)
         sdlpal[i].b = palette[i * 3 + 2] * 4;
     }
 
+#ifndef MRE
     // After setting colors, update the screen.
     SDL_SetPaletteColors(hr_surface->format->palette, sdlpal, 0, 16);
     SDL_BlitSurface(hr_surface, &screen_rect,
                     SDL_GetWindowSurface(hr_screen), &screen_rect);
     SDL_UpdateWindowSurfaceRects(hr_screen, &screen_rect, 1);
+
+#endif // !MRE
 }
 
 void I_FadeToPaletteHR(const byte *palette)
@@ -211,7 +217,9 @@ void I_FadeToPaletteHR(const byte *palette)
         }
 
         I_SetPaletteHR(tmppal);
+#ifndef MRE
         SDL_UpdateWindowSurface(hr_screen);
+#endif // !MRE
 
         // Sleep a bit
 

@@ -360,13 +360,18 @@ glob_t *I_StartGlob(const char *directory, const char *glob, int flags)
     return NULL;
 }
 
+glob_t *I_StartMultiGlob(const char *directory, int flags, const char *glob, ...)
+{
+    return NULL;
+}
+
 void I_EndGlob(glob_t *glob)
 {
 }
 
 const char *I_NextGlob(glob_t *glob)
 {
-    return "";
+    return NULL;
 }
 
 #endif /* #ifdef NO_DIRENT_IMPLEMENTATION */

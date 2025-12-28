@@ -50,10 +50,17 @@ SYSCALL(int, close, (int fd)) {
     return 0;
 }
 
-SYSCALL(off_t, lseek, (int fd, off_t offset, int whence)) {}
+SYSCALL(off_t, lseek, (int fd, off_t offset, int whence))
+{
+    if(fd < 3)
+        return -1;
+
+    vm_file_seek(fd - 3, offset, whence + 1);
+    return (off_t)vm_file_tell(fd - 3);
+}
 
 SYSCALL(int, open, (const char *pathname, int flags, ...)) {
-    VMUINT mre_mode = 0;
+    VMUINT mre_mode = MODE_READ;
     if (flags == O_RDONLY)
         mre_mode = MODE_READ;
     if (flags & O_WRONLY)
@@ -78,8 +85,10 @@ SYSCALL(void, exit, (int status)) {
 	cprintf("exit(%d)\n", status);
 
     vm_exit_app();
-	flush_layer();
-    thread_next();
+    flush_layer();
+
+    while (1)
+        thread_next();
 }
 
 SYSCALL(void, abort, ()){

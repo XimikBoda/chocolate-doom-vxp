@@ -19,6 +19,12 @@ static void addEvent(SDL_Event event)
     queueWriteIndex %= QUEUE_SIZE;
 }
 
+void SDL_PumpEvents(void) {}
+
+int SDL_PeepEvents(SDL_Event *events, int numevents, SDL_eventaction action, Uint32 minType, Uint32 maxType) {
+    return -1;
+}
+
 int SDL_PollEvent(SDL_Event *event) {
     if (!event)
         return queueWriteIndex != queueReadIndex;

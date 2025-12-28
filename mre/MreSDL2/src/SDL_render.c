@@ -8,6 +8,20 @@ SDL_Renderer* SDL_CreateRenderer(SDL_Window *window, int index, Uint32 flags){
     return (SDL_Renderer*)dummy;
 }
 
+int SDL_GetRendererInfo(SDL_Renderer *renderer, SDL_RendererInfo *info) {
+    if (!info)
+        return -1;
+
+    info->name = dummy;
+    info->flags = SDL_RENDERER_SOFTWARE;
+    info->num_texture_formats = 1;
+    info->texture_formats[0] = 16;
+    info->max_texture_width = vm_graphic_get_screen_height();
+    info->max_texture_height = vm_graphic_get_screen_width();
+
+    return 0;
+}
+
 int SDL_GetRendererOutputSize(SDL_Renderer *renderer, int *w, int *h) {
 #ifndef ROTATED
     *w = vm_graphic_get_screen_width();

@@ -6,8 +6,9 @@
 
 #include "thread.h"
 
-VMINT layer_hdl[1];
+VMINT layer_hdl[2];
 VMUINT16 *scr_buf = 0;
+VMUINT16 *scr_buf2 = 0;
 
 void handle_keyevt(VMINT event, VMINT keycode);
 
@@ -15,11 +16,11 @@ void thread()
 {
     thread_next();
 
-    const char *argv[1] = {"e:\\doom.exe"};
+    const char *argv[5] = {"e:\\doom.exe", "-mb", "2", "-iwad", "E:\\DOOM.WAD"};
 #ifdef WIN32
-    SDL_main(1, &argv);
+    SDL_main(5, &argv);
 #else
-    main(1, &argv);
+    main(5, &argv);
 #endif // WIN32
 }
 
@@ -35,6 +36,10 @@ void pre_vm_main()
 
     layer_hdl[0] = vm_graphic_create_layer(0, 0, screen_w, screen_h, -1);
     scr_buf = (VMUINT16*) vm_graphic_get_layer_buffer(layer_hdl[0]);
+
+    layer_hdl[1] = vm_graphic_create_layer(0, 0, screen_w, screen_h, -1);
+    scr_buf2 = (VMUINT16*) vm_graphic_get_layer_buffer(layer_hdl[1]);
+
     vm_graphic_set_clip(0, 0, screen_w, screen_h);
 
     console_init(screen_w, screen_h);
@@ -46,7 +51,7 @@ void vm_main_posix()
     vm_reg_keyboard_callback(handle_keyevt);
 
     thread_init();
-    thread_create(1024 * 1024, thread);
+    thread_create(64 * 1024, thread);
 
     vm_create_timer(1, timer);
 }

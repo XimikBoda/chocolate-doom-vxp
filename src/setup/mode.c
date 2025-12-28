@@ -208,6 +208,8 @@ static void SetExecutable(mission_config_t *config)
 
 #ifdef _WIN32
     extension = ".exe";
+#elif MRE
+    extension = ".vxp";
 #else
     extension = "";
 #endif

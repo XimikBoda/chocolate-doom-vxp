@@ -64,13 +64,13 @@ SYSCALL(int, open, (const char *pathname, int flags, ...)) {
     if (flags == O_RDONLY)
         mre_mode = MODE_READ;
     if (flags & O_WRONLY)
-        mre_mode |= MODE_WRITE;
+        mre_mode = MODE_WRITE;
     if (flags & O_RDWR)
-        mre_mode |= MODE_WRITE | MODE_READ;
+        mre_mode = MODE_WRITE;
     if (flags & O_CREAT)
-        mre_mode |= MODE_CREATE_ALWAYS_WRITE;
+        mre_mode = MODE_CREATE_ALWAYS_WRITE;
     if (flags & O_APPEND)
-        mre_mode |= MODE_APPEND;
+        mre_mode = MODE_APPEND;
 
     vm_ascii_to_ucs2(wpath_buf, 256, pathname);
     int fd = vm_file_open(wpath_buf, mre_mode, 1);
@@ -142,8 +142,10 @@ SYSCALL(int, link_r, (char *old, char *new)) {
 	return -1;
 }
 
-SYSCALL(int, unlink_r, (char *name)) {
-	return -1;
+SYSCALL(int, unlink_r, (struct _reent *ptr, const char *filename)) {
+    vm_ascii_to_ucs2(wpath_buf, 256, filename);
+
+    vm_file_delete(wpath_buf);
 }
 
 int fork(){

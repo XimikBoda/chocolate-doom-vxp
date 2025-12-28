@@ -29,6 +29,12 @@
 #include <process.h>
 #include <shellapi.h>
 
+#elif MRE
+
+#include "vmsys.h"
+#include "vmpromng.h"
+#include "vmchset.h"
+
 #else
 
 #include <sys/wait.h>
@@ -67,6 +73,9 @@ static char *TempFile(const char *s)
     {
         tempdir = ".";
     }
+#elif MRE
+    tempdir = "e:\\tmp";
+    M_MakeDirectory(tempdir);
 #else
     // Check the $TMPDIR environment variable to find the location.
 
@@ -264,6 +273,25 @@ static int ExecuteCommand(const char *program, const char *arg)
     free(command);
 
     return result;
+}
+
+#elif defined(MRE)
+
+boolean OpenFolder(const char *path) {
+    return 0;
+}
+
+static int ExecuteCommand(const char *program, const char *arg) {
+    char *path;
+    VMCHAR wstr[260];
+
+    path = M_StringJoin("e:\\mre\\", program, NULL);
+    vm_ascii_to_ucs2(wstr, 256, path);
+
+    free(path);
+
+    vm_start_app(wstr, 0, 4);
+    exit(0);
 }
 
 #else

@@ -290,7 +290,7 @@ static int ExecuteCommand(const char *program, const char *arg) {
 
     free(path);
 
-    vm_start_app(wstr, 0, 4);
+    vm_start_app_with_para(wstr, 0, 4, arg, strlen(arg) + 1);
     exit(0);
 }
 

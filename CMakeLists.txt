@@ -23,8 +23,8 @@ set(PACKAGE_LICENSE "GNU General Public License, version 2")
 set(DEVELOPER_NAME "")
 set(RAM "3250") #Ram requirement (in kb)
 set(IMSI "1234567890" CACHE STRING "Imsi of first SIM-card")
-set(API "File SIM_card ProMng UDP") #Api for app, 
-set(APPID "0") #App id, special values: -1 is personal (imsi), 0 is in developing
+set(API "File SIM_card ProMng UDP TCP HTTP  ") #Api for app,
+set(APPID "-1") #App id, special values: -1 is personal (imsi), 0 is in developing
 set(CERTID "1" CACHE STRING "") #Cert id use from you cert, 1 is personal (imsi)
 set(CERT "none" CACHE STRING "Path to cert, used when APPID!=-1 and CERTID!=1")
 option(BACKGROUND "App can work background" OFF)
@@ -54,7 +54,7 @@ endif()
 option(CMAKE_FIND_PACKAGE_PREFER_CONFIG
        "Lookup package config files before using find modules" On)
 
-option(ENABLE_SDL2_NET "Enable SDL2_net" Off)
+option(ENABLE_SDL2_NET "Enable SDL2_net" On)
 option(ENABLE_SDL2_MIXER "Enable SDL2_mixer" Off)
 
 if (NOT DEFINED EMSCRIPTEN)

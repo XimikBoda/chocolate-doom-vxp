@@ -1,6 +1,7 @@
 add_subdirectory(mreapi)
 add_subdirectory(MreSDL2)
 add_subdirectory(MreSDL2main)
+add_subdirectory(MreSDL2_net)
 add_subdirectory(resources)
 add_subdirectory(console)
 add_subdirectory(libco)

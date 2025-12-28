@@ -86,6 +86,9 @@ static SDL_Event keyevt_to_sdlevent(VMINT event, VMINT keycode) {
         case VM_KEY_RIGHT_SOFTKEY:
             ev.key.keysym.scancode = SDL_SCANCODE_ESCAPE;
             break;
+        case VM_KEY_NUM9:
+            ev.key.keysym.scancode = SDL_SCANCODE_F10;
+            break;
     }
 
     return ev;

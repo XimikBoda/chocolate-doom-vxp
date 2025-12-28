@@ -45,7 +45,7 @@
 #ifndef MRE
 #define BACKUPTICS 128
 #else
-#define BACKUPTICS 4 // TODO
+#define BACKUPTICS 128 // TODO
 #endif // !MRE
 
 

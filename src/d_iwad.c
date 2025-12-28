@@ -758,6 +758,11 @@ static void BuildIWADDirList(void)
     // Look in the current directory.  Doom always does this.
     AddIWADDir(".");
 
+#ifdef MRE
+    AddIWADDir("e:\\");
+    AddIWADDir("e:\\doom\\");
+#endif
+
     // Next check the directory where the executable is located. This might
     // be different from the current directory.
     AddIWADDir(M_DirName(myargv[0]));

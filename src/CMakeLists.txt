@@ -161,7 +161,17 @@ if(WIN32)
 	list(APPEND EXTRA_LIBS winmm shlwapi)
 endif()
 
-if(WIN32)
+if(DEFINED MRE)
+    add_exec_vxp("${PROGRAM_PREFIX}doom"
+            SRCS ${SOURCE_FILES_WITH_DEH}
+            RESOURCES resources
+            APP_NAME "${PROGRAM_PREFIX}doom"
+            APPID "${APPID}"
+            BACKGROUND ${BACKGROUND}
+            API "${API}"
+            RAM "${RAM}"
+    )
+elseif(WIN32)
     add_executable("${PROGRAM_PREFIX}doom" WIN32 ${SOURCE_FILES_WITH_DEH} "${CMAKE_CURRENT_BINARY_DIR}/doom-res.rc")
 else()
     add_executable("${PROGRAM_PREFIX}doom" ${SOURCE_FILES_WITH_DEH})

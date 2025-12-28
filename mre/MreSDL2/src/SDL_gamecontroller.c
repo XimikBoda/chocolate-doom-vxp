@@ -16,8 +16,20 @@ SDL_GameController* SDL_GameControllerOpen(int joystick_index) {
     return NULL;
 }
 
+const char* SDL_GameControllerName(SDL_GameController *gamecontroller) {
+    return NULL;
+}
+
 int SDL_GameControllerEventState(int state){
     return state;
+}
+
+Sint16 SDL_GameControllerGetAxis(SDL_GameController *gamecontroller, SDL_GameControllerAxis axis) {
+    return 0;
+}
+
+Uint8 SDL_GameControllerGetButton(SDL_GameController *gamecontroller, SDL_GameControllerButton button) {
+    return 0;
 }
 
 void SDL_GameControllerClose(SDL_GameController *gamecontroller){}

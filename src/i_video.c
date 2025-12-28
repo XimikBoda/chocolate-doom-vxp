@@ -838,18 +838,18 @@ void I_FinishUpdate (void)
     }
 
 
-    // Draw!
 
-    SDL_RenderPresent(renderer);
 #else
     for (int y = 0; y < SCREENHEIGHT; ++y)
         for (int x = 0; x < SCREENWIDTH; ++x) {
             VMUINT16 c = palette[I_VideoBuffer[y * SCREENWIDTH + x]];
             scr_buf[240 - 1 - y + (x) * 240] = c;
         }
-    flush_layer();
 #endif // !MRE
 
+    // Draw!
+
+    SDL_RenderPresent(renderer);
     // Restore background and undo the disk indicator, if it was drawn.
     V_RestoreDiskBackground();
 }

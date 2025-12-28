@@ -1,5 +1,7 @@
 #include "SDL_render.h"
 
+#include "thread.h"
+
 #define ROTATED
 
 static const char *dummy = ""; 
@@ -46,7 +48,10 @@ int SDL_RenderCopy(SDL_Renderer *renderer, SDL_Texture *texture,
     return 0;
 }
 
-void SDL_RenderPresent(SDL_Renderer *renderer){}
+void SDL_RenderPresent(SDL_Renderer *renderer) {
+    flush_layer();
+    thread_next();
+}
 
 void SDL_DestroyTexture(SDL_Texture *texture) {}
 

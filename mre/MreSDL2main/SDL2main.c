@@ -16,7 +16,7 @@ void thread()
 {
     thread_next();
 
-    const char *argv[5] = {"e:\\doom.exe", "-mb", "2", "-iwad", "E:\\DOOM.WAD"};
+    const char *argv[5] = {"e:\\doom.exe", "-mb", "1", "-iwad", "E:\\DOOM.WAD"};
 #ifdef WIN32
     SDL_main(5, &argv);
 #else
@@ -48,10 +48,11 @@ void pre_vm_main()
 void vm_main_posix()
 {
     vm_kbd_set_mode(VM_KEYPAD_2KEY_NUMBER);
+    vm_switch_power_saving_mode(turn_off_mode);
     vm_reg_keyboard_callback(handle_keyevt);
 
     thread_init();
-    thread_create(64 * 1024, thread);
+    thread_create(8 * 1024, thread);
 
     vm_create_timer(1, timer);
 }

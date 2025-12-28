@@ -42,7 +42,12 @@
 
 // Networking and tick handling related.
 
+#ifndef MRE
 #define BACKUPTICS 128
+#else
+#define BACKUPTICS 4 // TODO
+#endif // !MRE
+
 
 typedef struct _net_module_s net_module_t;
 typedef struct _net_packet_s net_packet_t;

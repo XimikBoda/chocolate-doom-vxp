@@ -25,7 +25,7 @@ int console_get_c_w() {
 void console_init(int _scr_w, int _scr_h)
 {
     scr_width = _scr_w;
-    scr_clear_width = _scr_w - 200;
+    scr_clear_width = _scr_w;
     scr_height = _scr_h;
     c_w = scr_height / char_width;
 }
